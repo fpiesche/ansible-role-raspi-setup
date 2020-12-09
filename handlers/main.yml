@@ -1,4 +1,4 @@
 ---
 - name: Reboot Pi
-  become: yes
+  become: true
   reboot:

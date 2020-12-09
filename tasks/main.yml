@@ -2,7 +2,7 @@
 - name: Set hostname
   hostname:
     name: "{{ local_hostname | default(inventory_hostname) }}"
-  become: yes
+  become: true
 
 - name: Add authorized keys for pi
   authorized_key:
@@ -26,8 +26,7 @@
   when: config_settings is defined
   notify:
     - Reboot Pi
-  become: yes
-  when: config_settings is defined
+  become: true
 
 - name: Change password for pi
   user:
