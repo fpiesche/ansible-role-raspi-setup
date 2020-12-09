@@ -12,6 +12,7 @@
   loop: "{{ authorized_keys }}"
   loop_control:
     loop_var: key
+  when: authorized_keys is defined
 
 - name: Set config.txt options
   lineinfile:
@@ -26,3 +27,10 @@
   notify:
     - Reboot Pi
   become: yes
+  when: config_settings is defined
+
+- name: Change password for pi
+  user:
+    name: pi
+    password: "{{ pi_password }}"
+  when: pi_password is defined
