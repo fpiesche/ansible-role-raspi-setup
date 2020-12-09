@@ -1,0 +1,28 @@
+---
+- name: Set hostname
+  hostname:
+    name: "{{ local_hostname | default(inventory_hostname) }}"
+  become: yes
+
+- name: Add authorized keys for pi
+  authorized_key:
+    user: pi
+    state: present
+    key: "{{ key }}"
+  loop: "{{ authorized_keys }}"
+  loop_control:
+    loop_var: key
+
+- name: Set config.txt options
+  lineinfile:
+    regexp: '^{{ setting.name }}='
+    line: "{{ setting.name }}={{ setting.value }}"
+    path: /boot/config.txt
+    state: present
+  loop: "{{ config_settings }}"
+  loop_control:
+    loop_var: setting
+  when: config_settings is defined
+  notify:
+    - Reboot Pi
+  become: yes
