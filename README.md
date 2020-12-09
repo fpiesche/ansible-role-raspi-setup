@@ -84,7 +84,7 @@ Here's a slice of the hosts.yml I use for my Docker cluster of various versions 
                   value: 75
               # This is used by Jeff Geerling's `geerlingguy.swap` role to set up a 1GB swap file.
               # https://github.com/geerlingguy/ansible-role-swap
-              swap_megabytes: 1024
+              swap_file_size_mb: 1024
 
             pi-2.local:
               pi_password: "{{ pi2-password | password_hash('sha512') }}"
@@ -110,4 +110,4 @@ Here's a slice of the hosts.yml I use for my Docker cluster of various versions 
                   value: 0
                 - name: "temp_limit"
                   value: 75
-              swap_megabytes: 1024
+              swap_file_size_mb: 1024
