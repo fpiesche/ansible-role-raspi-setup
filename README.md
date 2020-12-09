@@ -7,7 +7,7 @@ When run on a fresh installation of Raspberry Pi OS with only ssh enabled (add a
 called `ssh` to the `boot` partition on the SD card before first boot to do this!), this
 role can be used to:
 
-  * Set the `hostname` to match the hostname given in the Ansible inventory
+  * Set the `hostname` to match the hostname given in the Ansible inventory or from a variable called `local_hostname`
   * Set various options in different Pis' `config.txt` from a variable called `config_settings`
   * Add authorized ssh keys to the `pi` user for passwordless login from a variable called `authorized_keys`
   * Change the default password on the `pi` user from a variable called `pi_password`
@@ -88,6 +88,7 @@ Here's a slice of the hosts.yml I use for my Docker cluster of various versions 
 
             pi-2.local:
               pi_password: "{{ pi2-password | password_hash('sha512') }}"
+              local_hostname: that-other-one
               config_settings:
                 - name: "gpu_mem"
                   value: 16
