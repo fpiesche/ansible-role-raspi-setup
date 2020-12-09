@@ -28,7 +28,7 @@ Additionally, you can use the `geerlingguy.swap` to set up a swap file if needs 
       roles:
         # This role will automatically set up passwordless SSH for the given keys
         # and customize any config.txt settings passed in via the host inventory.
-        - role: raspi-setup
+        - role: fpiesche.raspi_setup
           vars:
             # These values will be the defaults for all of the Pis, but can be
             # overridden on a per-host basis.            
