@@ -1,0 +1,21 @@
+galaxy_info:
+  role_name: raspi-setup
+  author: Florian Piesche <florian@yellowkeycard.net>
+  description: Perform basic setup for headless use on newly deployed Raspberry Pi OS installations
+
+  license: 
+
+  min_ansible_version: 1.2
+
+  github_branch: main
+
+  platforms:
+  - name: Debian
+    versions:
+    - buster
+
+  galaxy_tags:
+    - raspberrypi
+    - raspbian
+    - headless
+    - raspi
