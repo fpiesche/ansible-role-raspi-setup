@@ -1,2 +1,3 @@
 ---
 authorized_keys: ["{{ lookup('file', lookup('env', 'HOME') + '/.ssh/id_rsa.pub') }}"]
+disable_ipv6: true

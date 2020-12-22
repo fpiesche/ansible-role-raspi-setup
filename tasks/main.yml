@@ -33,3 +33,20 @@
     name: pi
     password: "{{ pi_password }}"
   when: pi_password is defined
+
+- name: Disable IPv6
+  lineinfile:
+    line: "{{ line }}"
+    path: /etc/sysctl.conf
+    state: present
+  loop:
+    - net.ipv6.conf.all.disable_ipv6=1
+    - net.ipv6.conf.default.disable_ipv6=1
+    - net.ipv6.conf.lo.disable_ipv6=1
+    - net.ipv6.conf.eth0.disable_ipv6=1
+  loop_control:
+    loop_var: line
+  when: disable_ipv6
+  notify:
+    - Reboot Pi
+  become: true
