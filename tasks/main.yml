@@ -58,6 +58,7 @@
   apt:
     name: "{{ package.name }}"
     state: "{{ package.state }}"
+    autoremove: "{{ 'yes' if package.state == 'absent' else 'no' }}"
     purge: "{{ 'yes' if package.state == 'absent' else 'no' }}"
   loop:
     - "{{ packages }}"
