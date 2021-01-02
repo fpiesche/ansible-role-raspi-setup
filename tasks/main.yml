@@ -60,8 +60,7 @@
     state: "{{ package.state }}"
     autoremove: "{{ 'yes' if package.state == 'absent' else 'no' }}"
     purge: "{{ 'yes' if package.state == 'absent' else 'no' }}"
-  loop:
-    - "{{ packages }}"
+  loop: "{{ packages }}"
   loop_control:
     loop_var: package
   when: packages is defined
