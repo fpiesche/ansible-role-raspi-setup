@@ -54,6 +54,10 @@
     - Reboot Pi
   become: true
 
+- name: Update apt cache
+  apt:
+    update_cache: yes
+
 - name: Perform any package modifications requested
   apt:
     name: "{{ package.name }}"
