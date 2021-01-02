@@ -44,9 +44,23 @@
     - net.ipv6.conf.default.disable_ipv6=1
     - net.ipv6.conf.lo.disable_ipv6=1
     - net.ipv6.conf.eth0.disable_ipv6=1
+    - net.bridge.bridge-nf-call-iptables=0
+    - net.bridge.bridge-nf-call-arptables=0
+    - net.bridge.bridge-nf-call-ip6tables=0
   loop_control:
     loop_var: line
   when: disable_ipv6
   notify:
     - Reboot Pi
+  become: true
+
+- name: Perform any package modifications requested
+  package:
+    name: "{{ package.name }}"
+    state: "{{ package.state }}"
+  loop:
+    - "{{ packages }}"
+  loop_control:
+    loop_var: package
+  when: packages is defined
   become: true
