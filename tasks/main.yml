@@ -35,18 +35,25 @@
   when: pi_password is defined
 
 - name: Disable IPv6
-  lineinfile:
-    line: "{{ line }}"
-    path: /etc/sysctl.conf
-    state: present
+  ansible.posix.sysctl:
+    name: "{{ line.name }}"
+    value: "{{ line.value }}"
+    reload: true
   loop:
-    - net.ipv6.conf.all.disable_ipv6=1
-    - net.ipv6.conf.default.disable_ipv6=1
-    - net.ipv6.conf.lo.disable_ipv6=1
-    - net.ipv6.conf.eth0.disable_ipv6=1
-    - net.bridge.bridge-nf-call-iptables=0
-    - net.bridge.bridge-nf-call-arptables=0
-    - net.bridge.bridge-nf-call-ip6tables=0
+    - name: net.ipv6.conf.all.disable_ipv6
+      value: 1
+    - name: net.ipv6.conf.default.disable_ipv6
+      value: 1
+    - name: net.ipv6.conf.lo.disable_ipv6
+      value: 1
+    - name: net.ipv6.conf.eth0.disable_ipv6
+      value: 1
+    - name: net.bridge.bridge-nf-call-iptables
+      value: 0
+    - name: net.bridge.bridge-nf-call-arptables
+      value: 0
+    - name: net.bridge.bridge-nf-call-ip6tables
+      value: 0
   loop_control:
     loop_var: line
   when: disable_ipv6
