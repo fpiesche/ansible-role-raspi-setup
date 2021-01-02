@@ -48,12 +48,12 @@
       value: 1
     - name: net.ipv6.conf.eth0.disable_ipv6
       value: 1
-    - name: net.bridge.bridge-nf-call-iptables
-      value: 0
-    - name: net.bridge.bridge-nf-call-arptables
-      value: 0
-    - name: net.bridge.bridge-nf-call-ip6tables
-      value: 0
+    # - name: net.bridge.bridge-nf-call-iptables
+    #   value: 0
+    # - name: net.bridge.bridge-nf-call-arptables
+    #   value: 0
+    # - name: net.bridge.bridge-nf-call-ip6tables
+    #   value: 0
   loop_control:
     loop_var: line
   when: disable_ipv6
