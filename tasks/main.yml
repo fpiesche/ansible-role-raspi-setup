@@ -55,9 +55,10 @@
   become: true
 
 - name: Perform any package modifications requested
-  package:
+  apt:
     name: "{{ package.name }}"
     state: "{{ package.state }}"
+    purge: "{{ 'yes' if package.state == 'absent' else 'no' }}"
   loop:
     - "{{ packages }}"
   loop_control:
