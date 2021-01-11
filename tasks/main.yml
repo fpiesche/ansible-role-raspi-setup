@@ -60,6 +60,7 @@
   notify:
     - Reboot Pi
   become: true
+  ignore_errors: true
 
 - name: Update apt cache
   apt:
