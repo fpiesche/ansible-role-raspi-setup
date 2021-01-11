@@ -46,7 +46,7 @@
       value: 1
     - name: net.ipv6.conf.lo.disable_ipv6
       value: 1
-    - name: net.ipv6.conf.eth0.disable_ipv6
+    - name: net.ipv6.conf.{{ network_interface | default(ansible_default_ipv4.interface) }}.disable_ipv6
       value: 1
     - name: net.bridge.bridge-nf-call-iptables
       value: 0
@@ -60,7 +60,6 @@
   notify:
     - Reboot Pi
   become: true
-  ignore_errors: true
 
 - name: Update apt cache
   apt:
