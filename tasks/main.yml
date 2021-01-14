@@ -28,6 +28,54 @@
     - Reboot Pi
   become: true
 
+- name: Read cmdline.txt
+  slurp:
+    src: /boot/cmdline.txt
+  register: cmdline_current
+  when: cmdline_settings is defined
+
+- name: Parse cmdline.txt
+  set_fact:
+    cmdline: "{{ (cmdline_current['content'] | b64decode).split() }}"
+  when: cmdline_settings is defined
+
+- name: Prepare filter for cmdline.txt options to remove
+  set_fact:
+    cmdline_remove: []
+  when: cmdline_settings is defined
+
+- name: Assemble filter for cmdline.txt options to remove
+  set_fact:
+    cmdline_remove: "{{ cmdline_remove + [option.value] }}"
+  when: option.state is defined and option.state == 'absent'
+  loop: "{{ cmdline_settings }}"
+  loop_control:
+    loop_var: option
+  when: cmdline_settings is defined
+
+- name: Prepare list for cmdline.txt options to add
+  set_fact:
+    cmdline_add: []
+  when: cmdline_settings is defined
+
+- name: Assemble cmdline.txt options to add
+  set_fact:
+    cmdline_add: "{{ cmdline_add + [option.value] }}"
+  when: option.state is not defined or option.state == 'present'
+  loop: "{{ cmdline_settings }}"
+  loop_control:
+    loop_var: option
+  when: cmdline_settings is defined
+
+- name: Modify kernel command line
+  copy:
+    content: "{{ cmdline + cmdline_add | difference(cmdline_remove) | join(' ') }}"
+    dest: /boot/cmdline.txt
+  when: cmdline_settings is defined
+  notify:
+    - Reboot Pi
+  become: true
+
 - name: Change password for pi
   user:
     name: pi
@@ -48,12 +96,6 @@
       value: 1
     - name: net.ipv6.conf.{{ network_interface | default(ansible_default_ipv4.interface) }}.disable_ipv6
       value: 1
-    - name: net.bridge.bridge-nf-call-iptables
-      value: 0
-    - name: net.bridge.bridge-nf-call-arptables
-      value: 0
-    - name: net.bridge.bridge-nf-call-ip6tables
-      value: 0
   loop_control:
     loop_var: line
   when: disable_ipv6
