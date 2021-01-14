@@ -4,6 +4,12 @@
     name: "{{ local_hostname | default(inventory_hostname) }}"
   become: true
 
+- name: Generate SSH keys
+  community.crypto.openssh_keypair:
+    path: /home/pi/.ssh/id_rsa
+    type: rsa
+    size: 4096
+
 - name: Add authorized keys for pi
   authorized_key:
     user: pi
@@ -67,9 +73,13 @@
     loop_var: option
   when: cmdline_settings is defined
 
-- name: Modify kernel command line
+- name: Assemble new kernel command line
+  set_fact:
+    cmdline_new: "{{ cmdline + cmdline_add }}"
+
+- name: Write new kernel command line
   copy:
-    content: "{{ cmdline + cmdline_add | difference(cmdline_remove) | join(' ') }}"
+    content: "{{ cmdline_new | difference(cmdline_remove) | join(' ') }}"
     dest: /boot/cmdline.txt
   when: cmdline_settings is defined
   notify:
