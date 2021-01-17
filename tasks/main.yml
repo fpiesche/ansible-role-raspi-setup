@@ -53,11 +53,10 @@
 - name: Assemble filter for cmdline.txt options to remove
   set_fact:
     cmdline_remove: "{{ cmdline_remove + [option.value] }}"
-  when: option.state is defined and option.state == 'absent'
   loop: "{{ cmdline_settings }}"
   loop_control:
     loop_var: option
-  when: cmdline_settings is defined
+  when: cmdline_settings is defined and option.state is defined and option.state == 'absent'
 
 - name: Prepare list for cmdline.txt options to add
   set_fact:
