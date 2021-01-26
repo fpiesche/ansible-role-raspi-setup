@@ -4,6 +4,11 @@
     name: "{{ local_hostname | default(inventory_hostname) }}"
   become: true
 
+- name: Ensure ssh key path exists
+  file:
+    path: /home/pi/.ssh
+    state: directory
+
 - name: Generate SSH keys
   community.crypto.openssh_keypair:
     path: /home/pi/.ssh/id_rsa
