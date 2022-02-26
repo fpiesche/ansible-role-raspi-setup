@@ -1,138 +1,137 @@
 ---
 - name: Set hostname
   hostname:
-    name: "{{ local_hostname | default(inventory_hostname) }}"
+      name: "{{ local_hostname | default(inventory_hostname) }}"
   become: true
 
 - name: Ensure ssh key path exists
   file:
-    path: /home/pi/.ssh
-    state: directory
+      path: /home/pi/.ssh
+      state: directory
 
 - name: Generate SSH keys
   community.crypto.openssh_keypair:
-    path: /home/pi/.ssh/id_rsa
-    type: rsa
-    size: 4096
+      path: /home/pi/.ssh/id_rsa
+      type: rsa
+      size: 4096
 
 - name: Add authorized keys for pi
   authorized_key:
-    user: pi
-    state: present
-    key: "{{ key }}"
+      user: pi
+      state: present
+      key: "{{ key }}"
   loop: "{{ authorized_keys }}"
   loop_control:
-    loop_var: key
+      loop_var: key
   when: authorized_keys is defined
 
 - name: Set config.txt options
   lineinfile:
-    regexp: '^{{ setting.name }}='
-    line: "{{ setting.name }}={{ setting.value }}"
-    path: /boot/config.txt
-    state: present
+      regexp: "^{{ setting.name }}="
+      line: "{{ setting.name }}={{ setting.value }}"
+      path: /boot/config.txt
+      state: present
   loop: "{{ config_settings }}"
   loop_control:
-    loop_var: setting
+      loop_var: setting
   when: config_settings is defined
   notify:
-    - Reboot Pi
+      - Reboot Pi
   become: true
 
 - name: Read cmdline.txt
   slurp:
-    src: /boot/cmdline.txt
+      src: /boot/cmdline.txt
   register: cmdline_current
   when: cmdline_settings is defined
 
 - name: Parse cmdline.txt
   set_fact:
-    cmdline: "{{ (cmdline_current['content'] | b64decode).split() }}"
+      cmdline: "{{ (cmdline_current['content'] | b64decode).split() }}"
   when: cmdline_settings is defined
 
 - name: Prepare filter for cmdline.txt options to remove
   set_fact:
-    cmdline_remove: []
+      cmdline_remove: []
   when: cmdline_settings is defined
 
 - name: Assemble filter for cmdline.txt options to remove
   set_fact:
-    cmdline_remove: "{{ cmdline_remove + [option.value] }}"
+      cmdline_remove: "{{ cmdline_remove + [option.value] }}"
   loop: "{{ cmdline_settings }}"
   loop_control:
-    loop_var: option
+      loop_var: option
   when: cmdline_settings is defined and option.state is defined and option.state == 'absent'
 
 - name: Prepare list for cmdline.txt options to add
   set_fact:
-    cmdline_add: []
+      cmdline_add: []
   when: cmdline_settings is defined
 
 - name: Assemble cmdline.txt options to add
   set_fact:
-    cmdline_add: "{{ cmdline_add + [option.value] }}"
-  when: option.state is not defined or option.state == 'present'
+      cmdline_add: "{{ cmdline_add + [option.value] }}"
+  when: cmdline_settings is defined and (option.state is not defined or option.state == 'present')
   loop: "{{ cmdline_settings }}"
   loop_control:
-    loop_var: option
-  when: cmdline_settings is defined
+      loop_var: option
 
 - name: Assemble new kernel command line
   set_fact:
-    cmdline_new: "{{ cmdline + cmdline_add }}"
+      cmdline_new: "{{ cmdline + cmdline_add }}"
   when: cmdline_settings is defined
 
 - name: Write new kernel command line
   copy:
-    content: "{{ cmdline_new | difference(cmdline_remove) | join(' ') }}"
-    dest: /boot/cmdline.txt
+      content: "{{ cmdline_new | difference(cmdline_remove) | join(' ') }}"
+      dest: /boot/cmdline.txt
   when: cmdline_settings is defined
   notify:
-    - Reboot Pi
+      - Reboot Pi
   become: true
 
 - name: Change password for pi
   user:
-    name: pi
-    password: "{{ pi_password }}"
+      name: pi
+      password: "{{ pi_password }}"
   when: pi_password is defined
   become: true
 
 - name: Disable IPv6
   ansible.posix.sysctl:
-    name: "{{ line.name }}"
-    value: "{{ line.value }}"
-    reload: true
+      name: "{{ line.name }}"
+      value: "{{ line.value }}"
+      reload: true
   loop:
-    - name: net.ipv6.conf.all.disable_ipv6
-      value: 1
-    - name: net.ipv6.conf.default.disable_ipv6
-      value: 1
-    - name: net.ipv6.conf.lo.disable_ipv6
-      value: 1
-    - name: net.ipv6.conf.{{ network_interface | default(ansible_default_ipv4.interface) }}.disable_ipv6
-      value: 1
+      - name: net.ipv6.conf.all.disable_ipv6
+        value: 1
+      - name: net.ipv6.conf.default.disable_ipv6
+        value: 1
+      - name: net.ipv6.conf.lo.disable_ipv6
+        value: 1
+      - name: net.ipv6.conf.{{ network_interface | default(ansible_default_ipv4.interface) }}.disable_ipv6
+        value: 1
   loop_control:
-    loop_var: line
+      loop_var: line
   when: disable_ipv6
   notify:
-    - Reboot Pi
+      - Reboot Pi
   become: true
   ignore_errors: true
 
 - name: Update apt cache
   apt:
-    update_cache: yes
+      update_cache: true
   become: true
 
 - name: Perform any package modifications requested
   apt:
-    name: "{{ package.name }}"
-    state: "{{ package.state }}"
-    autoremove: "{{ 'yes' if package.state == 'absent' else 'no' }}"
-    purge: "{{ 'yes' if package.state == 'absent' else 'no' }}"
+      name: "{{ package.name }}"
+      state: "{{ package.state }}"
+      autoremove: "{{ 'true' if package.state == 'absent' else 'false' }}"
+      purge: "{{ 'true' if package.state == 'absent' else 'false' }}"
   loop: "{{ packages }}"
   loop_control:
-    loop_var: package
+      loop_var: package
   when: packages is defined
   become: true
