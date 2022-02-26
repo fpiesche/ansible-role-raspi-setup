@@ -96,6 +96,7 @@
     name: pi
     password: "{{ pi_password }}"
   when: pi_password is defined
+  become: true
 
 - name: Disable IPv6
   ansible.posix.sysctl:
