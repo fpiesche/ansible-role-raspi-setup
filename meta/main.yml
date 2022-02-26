@@ -13,6 +13,11 @@ galaxy_info:
   - name: Debian
     versions:
     - buster
+    - bullseye
+  - name: Raspberry Pi OS
+    versions:
+    - buster
+    - bullseye
 
   galaxy_tags:
     - raspberrypi
