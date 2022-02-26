@@ -80,6 +80,7 @@
 - name: Assemble new kernel command line
   set_fact:
     cmdline_new: "{{ cmdline + cmdline_add }}"
+  when: cmdline_settings is defined
 
 - name: Write new kernel command line
   copy:
