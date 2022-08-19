@@ -6,18 +6,18 @@
 
 - name: Ensure ssh key path exists
   file:
-      path: /home/pi/.ssh
+      path: /home/{{ ansible_user }}/.ssh
       state: directory
 
 - name: Generate SSH keys
   community.crypto.openssh_keypair:
-      path: /home/pi/.ssh/id_rsa
+      path: /home/{{ ansible_user }}/.ssh/id_rsa
       type: rsa
       size: 4096
 
-- name: Add authorized keys for pi
+- name: Add authorized keys for {{ ansible_user }}
   authorized_key:
-      user: pi
+      user: {{ ansible_user }}
       state: present
       key: "{{ key }}"
   loop: "{{ authorized_keys }}"
@@ -90,9 +90,9 @@
       - Reboot Pi
   become: true
 
-- name: Change password for pi
+- name: Change password for {{ ansible_user }}
   user:
-      name: pi
+      name: {{ ansible_user }}
       password: "{{ pi_password }}"
   when: pi_password is defined
   become: true
