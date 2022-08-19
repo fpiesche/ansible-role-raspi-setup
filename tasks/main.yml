@@ -17,7 +17,7 @@
 
 - name: Add authorized keys for {{ ansible_user }}
   authorized_key:
-      user: {{ ansible_user }}
+      user: "{{ ansible_user }}"
       state: present
       key: "{{ key }}"
   loop: "{{ authorized_keys }}"
@@ -92,7 +92,7 @@
 
 - name: Change password for {{ ansible_user }}
   user:
-      name: {{ ansible_user }}
+      name: "{{ ansible_user }}"
       password: "{{ pi_password }}"
   when: pi_password is defined
   become: true
